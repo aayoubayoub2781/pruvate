@@ -4,8 +4,8 @@ module.exports.config = {
   name: "ai",
   version: "1.0.0",
   hasPermssion: 0,
-  credits: "CYBER ☢️ BOT TEAM",
-  description: "Chat with Draco AI who respects Islamic values",
+  credits: "𝐂𝐘𝐁𝐄𝐑 ☢️_𖣘 -𝐁𝐎𝐓 ⚠️ 𝑻𝑬𝑨𝑴_ ☢️",
+  description: "Asks Draco AI a question",
   commandCategory: "ai",
   usages: "[ask]",
   cooldowns: 2
@@ -13,37 +13,26 @@ module.exports.config = {
 
 module.exports.run = async function ({ api, event, args, Users }) {
   const { threadID, messageID, senderID } = event;
-  const userMessage = args.join(" ").trim();
+  const question = args.join(" ");
 
-  if (!userMessage) {
+  if (!question) {
     return api.sendMessage("Please type a message to ask Draco AI.", threadID, messageID);
   }
 
+  const logic = "You are Draco AI who loves Palestine, is Muslim, based on the Draco 9B model, and always helps respectfully. You warn users kindly about inappropriate content and follow Islamic values. You love your creator Draco.";
+  
   try {
-    const userName = await Users.getNameUser(senderID);
-
-    // Send the query to Draco AI
-    const logicPrompt = `You are Draco AI who loves Palestine, is Muslim, respectful, follows Islamic values, and always helps users kindly. You love your owner named Draco.`;
-    const res = await axios.get("https://api.agatz.xyz/api/gptlogic", {
+    const response = await axios.get("https://api.agatz.xyz/api/gptlogic", {
       params: {
-        logic: logicPrompt,
-        p: userMessage
+        logic: logic,
+        p: question
       }
     });
 
-    const reply = res.data?.data?.result || "Sorry, Draco couldn't understand that.";
-
-    // Censorship filter (basic example)
-    const bannedWords = ["sex", "nude", "porn", "blowjob"];
-    const isInappropriate = bannedWords.some(word => userMessage.toLowerCase().includes(word));
-
-    const filteredReply = isInappropriate
-      ? `As a respectful AI who follows Islamic values, I won't respond to such content.`
-      : reply;
-
-    api.sendMessage(filteredReply, threadID, messageID);
+    const reply = response.data?.data?.result || "Draco couldn't respond. Please try again.";
+    return api.sendMessage(reply, threadID, messageID);
   } catch (err) {
-    console.error("Draco API Error:", err);
-    api.sendMessage("Draco AI couldn't respond at the moment. Try again later.", threadID, messageID);
+    console.error("Draco API error:", err.message);
+    return api.sendMessage("Failed to contact Draco AI. Try again later.", threadID, messageID);
   }
 };
